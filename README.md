@@ -39,8 +39,21 @@ nicht.
 
 Der Button **„⤓ INSTALLIEREN“** in der App zeigt diese Anleitung an; unter
 Android/Chrome löst er – sofern unterstützt – direkt die Installationsabfrage aus.
-Seit iOS 26 öffnet jeder per „Zum Home-Bildschirm“ hinzugefügte Link automatisch als
-Web App, auch ohne Manifest.
+In der installierten Web App ist er ausgeblendet (der Share-Sheet ist dort nicht
+erreichbar). Seit iOS 26 öffnet jeder per „Zum Home-Bildschirm“ hinzugefügte Link
+automatisch als Web App, auch ohne Manifest.
+
+## Ansicht auf dem iPhone
+
+- **Portrait:** Board links, NEXT/HOLD rechts, Score-Leiste und Touch-Buttons
+  darunter. Die Zellgröße berechnet sich aus Breite *und* Höhe des Viewports,
+  sodass alles – auch auf dem iPhone SE – ohne Scrollen passt. Es werden zwei
+  nächste Steine angezeigt.
+- **Landscape:** Board links, schmale Spalte mit Vorschau, Werten und Controls
+  rechts; Titel und Installationsbutton entfallen.
+- Statusleiste, Notch und Home-Indikator werden über `viewport-fit=cover` und
+  `env(safe-area-inset-*)` berücksichtigt. Wischen auf dem Board löst kein
+  Scrollen/Zoomen aus; die App pausiert beim Verlassen der Seite.
 
 ## Gamecontroller
 

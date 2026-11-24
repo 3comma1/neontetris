@@ -31,8 +31,10 @@
     display:flex; flex-direction:column; align-items:center; min-height:100vh;
     min-height:100dvh;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    overflow-x:hidden; -webkit-user-select:none; user-select:none;
+    overflow-x:hidden; overscroll-behavior:none;
+    -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
   }
+  button{-webkit-tap-highlight-color:transparent; touch-action:manipulation}
   /* Hintergrund: Neon-Grid + Nebel */
   body::before{
     content:''; position:fixed; inset:0; z-index:-2;
@@ -61,6 +63,7 @@
 
   .wrap{display:flex; gap:24px; align-items:flex-start; padding:0 14px}
   .col{display:flex; flex-direction:column; gap:12px; width:172px}
+  .hud-row{display:flex; flex-direction:column; gap:12px}
   .panel{
     border:1px solid rgba(0,246,255,.35); border-radius:10px; padding:10px 12px;
     background:rgba(0,0,0,.45);
@@ -87,7 +90,7 @@
       #04010a;
     background-size:var(--cell) var(--cell);
     border:1px solid rgba(120,160,255,.25);
-    transition:transform .05s;
+    transition:transform .05s; touch-action:none;
   }
   #board.shake{transform:translateY(4px)}
   #board.flash{box-shadow:inset 0 0 60px rgba(255,255,255,.8)}
@@ -120,7 +123,8 @@
     background:color-mix(in srgb, var(--c, #fff) 22%, transparent);
     box-shadow:0 0 4px var(--c, #fff), 0 0 10px var(--c, #fff), inset 0 0 5px var(--c, #fff);
   }
-  .hold-box{justify-content:center}
+  .hold-box{display:flex; justify-content:center}
+  .hold-box .mini{height:calc(var(--cell)*4)}
   .hold-box.used{opacity:.35; filter:grayscale(.6)}
 
   .overlay{
@@ -136,15 +140,16 @@
   .blink{animation:blink 1s steps(2,start) infinite; color:#fff}
   @keyframes blink{50%{opacity:0}}
 
-  .touch{display:none; gap:8px; margin:14px 10px 24px; flex-wrap:wrap; justify-content:center}
+  .touch{display:none; gap:6px; grid-template-columns:repeat(6,minmax(0,1fr))}
   .touch button{
-    min-width:56px; min-height:48px; padding:0 12px; font-family:var(--font);
-    font-size:18px; font-weight:900; color:#eaf6ff; cursor:pointer;
+    min-width:0; min-height:46px; padding:0 4px; font-family:var(--font);
+    font-size:16px; font-weight:900; color:#eaf6ff; cursor:pointer;
     background:rgba(0,0,0,.5); border:1px solid rgba(0,246,255,.5); border-radius:10px;
     box-shadow:0 0 10px rgba(0,246,255,.25), inset 0 0 10px rgba(0,0,0,.6);
   }
   .touch button:active{background:rgba(0,246,255,.25)}
-  .touch .wide{flex:1 1 100%}
+  .touch .wide{grid-column:span 4; font-size:14px; letter-spacing:.1em}
+  .touch [data-a="pause"]{grid-column:span 2}
 
   /* Statusleiste / Installations-Dialog */
   .toprow{
@@ -182,13 +187,69 @@
   .modal-card .btn{padding:9px 22px; font-size:13px}
   .padhint b{color:#fff}
 
+  /* iPhone / Touch-Geräte: Board, Vorschau und Controls passen in den Viewport.
+     --cell wird aus Breite UND Höhe berechnet, damit nichts unter den Rand rutscht. */
   @media (pointer:coarse), (max-width:760px){
-    .wrap{flex-direction:column; align-items:center}
-    .col{width:calc(var(--cell)*10 + 22px)}
-    .grid4{grid-template-columns:repeat(4,1fr)}
-    .next-list{flex-direction:row}
+    :root{
+      --cell:clamp(14px, min(calc((100vw - 60px)/18), calc((100dvh - 285px)/20)), 26px);
+    }
+    h1{margin:10px 0 8px; font-size:clamp(22px,6vw,30px); letter-spacing:.22em}
+    .toprow{padding:0 10px 8px; gap:8px}
+    .pad-status{font-size:10px; padding:5px 10px; max-width:54vw}
+    #installBtn{font-size:10px; padding:5px 10px}
+
+    .wrap{
+      display:grid; width:100%; padding:0 8px;
+      grid-template-columns:max-content max-content;
+      grid-template-areas:
+        "board next"
+        "board hold"
+        "hud   hud"
+        "touch touch";
+      gap:8px 10px; justify-content:center; align-content:start;
+    }
+    .wrap > .col{display:contents}
+    .board-shell{grid-area:board}
+    .next-panel{grid-area:next; padding:6px}
+    .hold-panel{grid-area:hold; padding:6px}
+    .next-list .mini:nth-child(n+3){display:none}
+    .hud-row{grid-area:hud; flex-direction:row; gap:8px}
+    .hud-row .panel{flex:1; min-width:0; padding:7px 10px}
+    .score-panel .value{font-size:18px}
+    .grid4{grid-template-columns:repeat(4,1fr); gap:4px}
+    .grid4 .value{font-size:13px}
+    .grid4 .label{font-size:9px; letter-spacing:.1em}
+    .next-list{flex-direction:row; gap:6px}
+    .panel .label{font-size:10px; margin-bottom:4px}
     .hint{display:none}
-    .touch{display:flex}
+    .touch{grid-area:touch; display:grid; margin:2px 0 0}
+  }
+
+  /* iPhone quer: Board links, alles andere in einer schmalen Spalte rechts */
+  @media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
+    :root{
+      --cell:clamp(11px, min(calc((100dvh - 55px)/20), calc((100dvh - 280px)/8)), 20px);
+    }
+    h1{display:none}
+    .toprow{padding:2px 8px 4px}
+    .wrap{
+      grid-template-columns:max-content minmax(0,1fr);
+      grid-template-areas:
+        "board next"
+        "board hold"
+        "board hud"
+        "board touch";
+      gap:6px 10px;
+    }
+    .next-panel{grid-area:next}
+    .hold-panel{grid-area:hold}
+    .hud-row{grid-area:hud; flex-direction:column; gap:6px}
+    .hud-row .panel{padding:5px 8px}
+    .next-list .mini:nth-child(n+3){display:none}
+    .touch{grid-area:touch; margin:0; grid-template-columns:repeat(5,minmax(0,1fr))}
+    .touch button{min-height:32px; font-size:13px}
+    .touch .wide{grid-column:span 3}
+    .touch [data-a="pause"]{grid-column:span 1}
   }
 </style>
 </head>
@@ -203,17 +264,19 @@
 
 <div class="wrap">
   <aside class="col">
-    <div class="panel">
-      <div class="label">SCORE</div>
-      <div class="value" id="score">0</div>
+    <div class="hud-row">
+      <div class="panel score-panel">
+        <div class="label">SCORE</div>
+        <div class="value" id="score">0</div>
+      </div>
+      <div class="panel grid4 stats-panel">
+        <div><div class="label">LEVEL</div><div class="value" id="level">1</div></div>
+        <div><div class="label">LINES</div><div class="value" id="lines">0</div></div>
+        <div><div class="label">BEST</div><div class="value" id="best">0</div></div>
+        <div><div class="label">MS</div><div class="value" id="speed">1000</div></div>
+      </div>
     </div>
-    <div class="panel grid4">
-      <div><div class="label">LEVEL</div><div class="value" id="level">1</div></div>
-      <div><div class="label">LINES</div><div class="value" id="lines">0</div></div>
-      <div><div class="label">BEST</div><div class="value" id="best">0</div></div>
-      <div><div class="label">MS</div><div class="value" id="speed">1000</div></div>
-    </div>
-    <div class="panel">
+    <div class="panel hold-panel">
       <div class="label">HOLD <span style="opacity:.6">[C]</span></div>
       <div class="hold-box" id="hold"></div>
     </div>
@@ -238,7 +301,7 @@
   </div>
 
   <aside class="col">
-    <div class="panel">
+    <div class="panel next-panel">
       <div class="label">NEXT</div>
       <div class="next-list" id="next"></div>
     </div>
@@ -259,17 +322,17 @@
       <b>Start</b> start / pause
     </div>
   </aside>
-</div>
 
-<div class="touch">
-  <button data-a="left">◀</button>
-  <button data-a="rotccw">⟲</button>
-  <button data-a="rot">⟳</button>
-  <button data-a="right">▶</button>
-  <button data-a="down">▼</button>
-  <button data-a="drop" class="wide">HARD DROP</button>
-  <button data-a="hold">HOLD</button>
-  <button data-a="pause">⏸</button>
+  <div class="touch">
+    <button data-a="left">◀</button>
+    <button data-a="rotccw">⟲</button>
+    <button data-a="rot">⟳</button>
+    <button data-a="right">▶</button>
+    <button data-a="down">▼</button>
+    <button data-a="hold">HOLD</button>
+    <button data-a="drop" class="wide">HARD DROP</button>
+    <button data-a="pause">⏸</button>
+  </div>
 </div>
 
 <div class="modal hidden" id="installHelp" role="dialog" aria-modal="true" aria-labelledby="installTitle">
@@ -779,6 +842,11 @@
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  // In der installierten Web App ist der Share-Sheet nicht erreichbar:
+  // dann braucht die Installationshilfe keinen Platz.
+  if (navigator.standalone === true || matchMedia('(display-mode: standalone)').matches) {
+    installBtn.hidden = true;
+  }
   installBtn.addEventListener('click', async () => {
     if (deferredPrompt) {
       try { await deferredPrompt.prompt(); await deferredPrompt.userChoice; } catch (e) {}
@@ -798,14 +866,6 @@
   installHelp.addEventListener('click', e => {
     if (e.target === installHelp) installHelp.classList.add('hidden');
   });
-
-  /* ===== Responsive ===== */
-  function resize() {
-    const s = Math.max(14, Math.min(26, (innerWidth - 40) / 10, (innerHeight - 200) / 20));
-    document.documentElement.style.setProperty('--cell', s + 'px');
-  }
-  addEventListener('resize', resize);
-  resize();
 
   /* ===== Init ===== */
   board = makeBoard();

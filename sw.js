@@ -1,6 +1,6 @@
 /* Service Worker für NEON TETRIS: App-Shell offline verfügbar machen.
    Bei Änderungen an index.html/manifest/icons die CACHE-Version erhöhen. */
-const CACHE = 'neon-tetris-v1';
+const CACHE = 'neon-tetris-v2';
 
 const ASSETS = [
   './',
