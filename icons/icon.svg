@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="glowM" cx="0" cy="0" r="1">
+      <stop offset="0" stop-color="#ff2df5" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ff2df5" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowC" cx="1" cy="1" r="1">
+      <stop offset="0" stop-color="#00f6ff" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#00f6ff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M42 0H0V42" fill="none" stroke="#00f6ff" stroke-opacity=".07" stroke-width="1"/>
+    </pattern>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#05010d"/>
+  <rect width="512" height="512" fill="url(#glowM)"/>
+  <rect width="512" height="512" fill="url(#glowC)"/>
+  <rect width="512" height="512" fill="url(#grid)"/>
+  <g filter="url(#glow)" stroke="#fff" stroke-opacity=".85" stroke-width="3">
+    <rect x="62"  y="133" width="116" height="116" rx="18" fill="#ff2df5"/>
+    <rect x="198" y="133" width="116" height="116" rx="18" fill="#ff2df5"/>
+    <rect x="334" y="133" width="116" height="116" rx="18" fill="#ff2df5"/>
+    <rect x="198" y="269" width="116" height="116" rx="18" fill="#00f6ff"/>
+  </g>
+</svg>
