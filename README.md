@@ -45,12 +45,17 @@ automatisch als Web App, auch ohne Manifest.
 
 ## Ansicht auf dem iPhone
 
-- **Portrait:** Board links, NEXT/HOLD rechts, Score-Leiste und Touch-Buttons
-  darunter. Die Zellgröße berechnet sich aus Breite *und* Höhe des Viewports,
-  sodass alles – auch auf dem iPhone SE – ohne Scrollen passt. Es werden zwei
-  nächste Steine angezeigt.
-- **Landscape:** Board links, schmale Spalte mit Vorschau, Werten und Controls
-  rechts; Titel und Installationsbutton entfallen.
+Der **Tunnel nimmt den verfügbaren Bildschirm ein**; alles andere ist auf Mini-
+Anzeigen reduziert:
+
+- **Portrait:** Eine schmale Mini-Leiste oben mit Score, Level, Linien, Bestwert
+  sowie verkleinerten HOLD-/NEXT-Vorschauen; darunter das Board, darunter eine
+  einzelne Reihe Touch-Buttons. Die Zellgröße berechnet sich aus Breite *und*
+  Höhe des Viewports (inkl. Safe Area), sodass auch auf dem iPhone SE alles
+  ohne Scrollen passt.
+- **Landscape:** Das Board nutzt fast die komplette Höhe, die Mini-Anzeigen und
+  Touch-Buttons stehen in einer schmalen Spalte rechts daneben. Titel und
+  Statusleiste entfallen.
 - Statusleiste, Notch und Home-Indikator werden über `viewport-fit=cover` und
   `env(safe-area-inset-*)` berücksichtigt. Wischen auf dem Board löst kein
   Scrollen/Zoomen aus; die App pausiert beim Verlassen der Seite.
@@ -84,6 +89,6 @@ Game Over, damit sich das Spiel jederzeit mit Start fortsetzen lässt.
 ## Offline & Aktualisieren
 
 Beim ersten Online-Aufruf legt der Service Worker `index.html`, Manifest, Icons und
-sich selbst im Cache `neon-tetris-v1` ab. Danach funktioniert das Spiel ohne Netz.
+sich selbst im Cache `neon-tetris-v3` ab. Danach funktioniert das Spiel ohne Netz.
 Nach Änderungen am Spiel die Versionsnummer `CACHE` in `sw.js` erhöhen; alte Caches
 werden beim Aktivieren automatisch entfernt.

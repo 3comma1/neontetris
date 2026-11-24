@@ -140,6 +140,15 @@
   .blink{animation:blink 1s steps(2,start) infinite; color:#fff}
   @keyframes blink{50%{opacity:0}}
 
+  /* Mini-Leiste für Mobile: Werte + Hold/Next in einer einzigen Zeile */
+  .mb{display:none}
+  .mmini{display:inline-flex; gap:2px; vertical-align:middle; margin-left:2px}
+  .mmini .mini{
+    grid-template-columns:repeat(4,var(--mini-cell));
+    grid-auto-rows:var(--mini-cell); height:calc(var(--mini-cell)*4);
+  }
+  .mmini .mc{width:var(--mini-cell); height:var(--mini-cell)}
+
   .touch{display:none; gap:6px; grid-template-columns:repeat(6,minmax(0,1fr))}
   .touch button{
     min-width:0; min-height:46px; padding:0 4px; font-family:var(--font);
@@ -187,69 +196,81 @@
   .modal-card .btn{padding:9px 22px; font-size:13px}
   .padhint b{color:#fff}
 
-  /* iPhone / Touch-Geräte: Board, Vorschau und Controls passen in den Viewport.
-     --cell wird aus Breite UND Höhe berechnet, damit nichts unter den Rand rutscht. */
+  /* iPhone: Der Tunnel bekommt fast den ganzen Bildschirm.
+     Alles andere sitzt in einer Mini-Zeile oben und einer Button-Zeile unten. */
   @media (pointer:coarse), (max-width:760px){
     :root{
-      --cell:clamp(14px, min(calc((100vw - 60px)/18), calc((100dvh - 285px)/20)), 26px);
-    }
-    h1{margin:10px 0 8px; font-size:clamp(22px,6vw,30px); letter-spacing:.22em}
-    .toprow{padding:0 10px 8px; gap:8px}
-    .pad-status{font-size:10px; padding:5px 10px; max-width:54vw}
-    #installBtn{font-size:10px; padding:5px 10px}
-
-    .wrap{
-      display:grid; width:100%; padding:0 8px;
-      grid-template-columns:max-content max-content;
-      grid-template-areas:
-        "board next"
-        "board hold"
-        "hud   hud"
-        "touch touch";
-      gap:8px 10px; justify-content:center; align-content:start;
-    }
-    .wrap > .col{display:contents}
-    .board-shell{grid-area:board}
-    .next-panel{grid-area:next; padding:6px}
-    .hold-panel{grid-area:hold; padding:6px}
-    .next-list .mini:nth-child(n+3){display:none}
-    .hud-row{grid-area:hud; flex-direction:row; gap:8px}
-    .hud-row .panel{flex:1; min-width:0; padding:7px 10px}
-    .score-panel .value{font-size:18px}
-    .grid4{grid-template-columns:repeat(4,1fr); gap:4px}
-    .grid4 .value{font-size:13px}
-    .grid4 .label{font-size:9px; letter-spacing:.1em}
-    .next-list{flex-direction:row; gap:6px}
-    .panel .label{font-size:10px; margin-bottom:4px}
-    .hint{display:none}
-    .touch{grid-area:touch; display:grid; margin:2px 0 0}
-  }
-
-  /* iPhone quer: Board links, alles andere in einer schmalen Spalte rechts */
-  @media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
-    :root{
-      --cell:clamp(11px, min(calc((100dvh - 55px)/20), calc((100dvh - 280px)/8)), 20px);
+      --cell:clamp(10px, min(calc((100vw - 12px)/10),
+        calc((100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 124px)/20)), 44px);
+      --mini-cell:clamp(5px, calc(var(--cell)*0.21), 8px);
     }
     h1{display:none}
-    .toprow{padding:2px 8px 4px}
+    .toprow{min-height:18px; padding:2px 8px; gap:8px}
+    .pad-status{font-size:9px; padding:3px 8px; max-width:52vw}
+    #installBtn{font-size:9px; padding:3px 8px}
+
     .wrap{
-      grid-template-columns:max-content minmax(0,1fr);
-      grid-template-areas:
-        "board next"
-        "board hold"
-        "board hud"
-        "board touch";
-      gap:6px 10px;
+      display:flex; flex-direction:column; align-items:center;
+      flex:1; min-height:0; width:100%; padding:0 8px; gap:4px;
     }
-    .next-panel{grid-area:next}
-    .hold-panel{grid-area:hold}
-    .hud-row{grid-area:hud; flex-direction:column; gap:6px}
-    .hud-row .panel{padding:5px 8px}
-    .next-list .mini:nth-child(n+3){display:none}
-    .touch{grid-area:touch; margin:0; grid-template-columns:repeat(5,minmax(0,1fr))}
-    .touch button{min-height:32px; font-size:13px}
-    .touch .wide{grid-column:span 3}
-    .touch [data-a="pause"]{grid-column:span 1}
+    .wrap > .col{display:none}
+
+    .mb{
+      display:flex; order:0; align-items:center; justify-content:space-between;
+      width:100%; max-width:calc(var(--cell)*10 + 22px); min-height:26px;
+      gap:5px; padding:2px 6px; font-size:10px; letter-spacing:.04em;
+      color:#9fd8ff; border:1px solid rgba(0,246,255,.25);
+      border-radius:8px; background:rgba(0,0,0,.5);
+    }
+    .mb b{color:#fff; font-size:12px}
+    .mb .mmini .mini{width:calc(var(--mini-cell)*4)}
+
+    .board-shell{
+      order:1; flex:none; margin:auto 0;
+      width:calc(var(--cell)*10 + 22px); height:calc(var(--cell)*20 + 22px);
+      padding:10px;
+    }
+    .hint{display:none}
+
+    .touch{
+      display:flex; order:2; gap:5px; margin:0;
+      width:100%; max-width:calc(var(--cell)*10 + 22px);
+    }
+    .touch button{
+      flex:1 1 0; min-width:0; min-height:42px; padding:0 2px;
+      font-size:14px; border-radius:8px;
+    }
+    .touch .wide{grid-column:auto; font-size:12px; letter-spacing:0}
+    .touch [data-a="pause"]{grid-column:auto}
+  }
+
+  /* iPhone quer: Der Tunnel nimmt die komplette Höhe ein,
+     Mini-Anzeigen und Buttons stehen schmal rechts daneben. */
+  @media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
+    :root{
+      --cell:clamp(10px, min(calc((100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 46px)/20), calc((100vw - 190px)/10)), 26px);
+      --mini-cell:clamp(5px, calc(var(--cell)*0.17), 7px);
+    }
+    .toprow{display:none}
+    .wrap{
+      display:grid; flex:none; width:100%; padding:0 8px;
+      grid-template-columns:max-content minmax(120px,1fr);
+      grid-template-areas:"board bar" "board touch";
+      align-content:center; justify-content:center; gap:6px 10px;
+    }
+    .board-shell{grid-area:board; margin:0}
+    .mb{
+      grid-area:bar; flex-direction:column; align-items:stretch; gap:4px;
+      width:100%; max-width:none; min-height:0; padding:6px; font-size:11px;
+    }
+    .mb .mmini .mini{width:calc(var(--mini-cell)*4)}
+    .touch{
+      grid-area:touch; display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+      width:100%; max-width:none; margin:0; gap:5px; align-self:start;
+    }
+    .touch button{min-height:34px}
+    .touch .wide{grid-column:span 2; font-size:11px}
+    .touch [data-a="pause"]{grid-column:auto}
   }
 </style>
 </head>
@@ -298,6 +319,15 @@
       <div class="sub">SCORE <b id="finalScore">0</b></div>
       <div class="sub blink">ENTER = neu spielen</div>
     </div>
+  </div>
+
+  <div class="mb" id="mobileBar">
+    <span>S <b id="mScore">0</b></span>
+    <span>LV <b id="mLevel">1</b></span>
+    <span>LN <b id="mLines">0</b></span>
+    <span>B <b id="mBest">0</b></span>
+    <span>H<span class="mmini" id="mHold"></span></span>
+    <span>N<span class="mmini" id="mNext"></span></span>
   </div>
 
   <aside class="col">
@@ -374,6 +404,14 @@
     lines: document.getElementById('lines'),
     best:  document.getElementById('best'),
     speed: document.getElementById('speed')
+  };
+  const m = {   // Mini-Leiste auf dem iPhone
+    score: document.getElementById('mScore'),
+    level: document.getElementById('mLevel'),
+    lines: document.getElementById('mLines'),
+    best:  document.getElementById('mBest'),
+    hold:  document.getElementById('mHold'),
+    next:  document.getElementById('mNext')
   };
   const ov = {
     start: document.getElementById('startOv'),
@@ -533,6 +571,15 @@
     hud.lines.textContent = lines;
     hud.best.textContent  = best;
     hud.speed.textContent = Math.round(speed());
+
+    m.score.textContent = score;
+    m.level.textContent = level;
+    m.lines.textContent = lines;
+    m.best.textContent  = best;
+    m.hold.innerHTML = '';
+    m.hold.appendChild(mini(holdType));
+    m.next.innerHTML = '';
+    for (const t of queue.slice(0, 2)) m.next.appendChild(mini(t));
   }
 
   /* ===== Spiel-Logik ===== */
@@ -871,6 +918,7 @@
   board = makeBoard();
   refill(5);
   hud.best.textContent = best;
+  m.best.textContent = best;
   renderSide(); render();
 })();
 </script>
